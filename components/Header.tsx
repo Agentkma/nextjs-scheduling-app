@@ -74,24 +74,25 @@ const loginButtonText =getLoginButtonText(status, session)
         >
           <CalendarTodayIcon />
         </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Grid2 container spacing={2} alignItems="center" flexGrow={1}>
+        <Typography variant="h6" component="div">
           Schedule Pal
         </Typography>
        {session &&  (
-        <Grid2 container alignContent='space-between' spacing={2}>
-          <Link href="/" component={NextLink} data-active={isActive("/")} >Appointments</Link>
-          <Link href="/create" component={NextLink} data-active={isActive("/")} >Schedule Now</Link>
-          <Link href="/drafts" component={NextLink} data-active={isActive("/drafts")} >Drafts</Link>
-        </Grid2>)}
+          <>
+          <Link href="/" component={NextLink} data-active={isActive("/")} color='inherit' underline="hover">Appointments</Link>
+          <Link href="/create" component={NextLink} data-active={isActive("/create")} color='inherit' underline="hover">Schedule Now</Link></>
+       )}
+        </Grid2>
         {session && 
-          <Stack> 
+          <Grid2 container spacing={2}  alignItems="center">
             <Typography variant="body2">{session.user.name}</Typography>
-            <Button color="inherit" onClick={() => signOut()}>
+            <Button color="inherit" variant='outlined' onClick={() => signOut()}>
             <Typography>{loginButtonText}</Typography>  
             </Button>
-          </Stack>
+          </Grid2>
         }
-      {!session &&  <NextLink  href="/api/auth/signin"><Button  variant='outlined'color="inherit"data-active={isActive('/signup')}>{loginButtonText}</Button></NextLink>}
+      {!session &&  <NextLink  href="/api/auth/signin"><Button  variant='outlined'data-active={isActive('/signup')}>{loginButtonText}</Button></NextLink>}
       </Toolbar>
     </AppBar>
   </Box>)
