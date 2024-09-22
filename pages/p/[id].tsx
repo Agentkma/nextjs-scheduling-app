@@ -2,7 +2,7 @@ import React from "react"
 import { GetServerSideProps } from "next"
 import ReactMarkdown from "react-markdown"
 import Layout from "../../components/Layout"
-import { PostProps } from "../../components/Post"
+import { AppointmentProps } from "../../components/Appointment"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const post = {
@@ -20,17 +20,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   }
 }
 
-const Post: React.FC<PostProps> = (props) => {
+const Post: React.FC<AppointmentProps> = (props) => {
   let title = props.title
-  if (!props.published) {
+
     title = `${title} (Draft)`
-  }
+  
 
   return (
     <Layout>
       <div>
         <h2>{title}</h2>
-        <p>By {props?.author?.name || "Unknown author"}</p>
+        <p>By {props?.user?.name || "Unknown user"}</p>
         <ReactMarkdown children={props.content} />
       </div>
       <style jsx>{`
