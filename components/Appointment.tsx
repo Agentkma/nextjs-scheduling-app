@@ -1,6 +1,7 @@
 import React from "react";
 import Router from "next/router";
 import ReactMarkdown from "react-markdown";
+import { Card, CardContent, CardHeader,  } from "@mui/material";
 
 export type AppointmentProps = {
   id: string;
@@ -16,17 +17,18 @@ export type AppointmentProps = {
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
   const userName = appointment.user ? appointment.user.name : "Unknown user";
   return (
-    <div onClick={() => Router.push("/p/[id]", `/p/${appointment.id}`)}>
-      <h2>{appointment.title}</h2>
-      <small>Appointment for:  {userName}</small>
-      <ReactMarkdown children={appointment.content} />
-      <style jsx>{`
-        div {
-          color: inherit;
-          padding: 2rem;
-        }
-      `}</style>
-    </div>
+    <Card onClick={() => Router.push("/p/[id]", `/p/${appointment.id}`)}   sx={{
+      '&:hover': {
+        cursor: 'pointer',
+        boxShadow: '1px 1px 6px #aaa', 
+      },
+    }}
+  >
+      <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`}/>
+      <CardContent>  
+        <ReactMarkdown children={appointment.content} />
+      </CardContent>
+    </Card>
   );
 };
 

@@ -5,7 +5,7 @@ import Layout from "../../components/Layout"
 import { AppointmentProps } from "../../components/Appointment"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const post = {
+  const appointment = {
     id: "1",
     title: "Prisma is the perfect ORM for Next.js",
     content: "[Prisma](https://github.com/prisma/prisma) and Next.js go _great_ together!",
@@ -16,11 +16,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
   }
   return {
-    props: post,
+    props: appointment,
   }
 }
 
-const Post: React.FC<AppointmentProps> = (props) => {
+const Appointment: React.FC<AppointmentProps> = (props) => {
   let title = props.title
 
     title = `${title} (Draft)`
@@ -58,4 +58,4 @@ const Post: React.FC<AppointmentProps> = (props) => {
   )
 }
 
-export default Post
+export default Appointment
