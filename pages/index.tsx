@@ -20,7 +20,8 @@ export const getStaticProps: GetStaticProps = async () => {
 // Convert Date objects to strings
 const serializedSchedule = schedule.map(appointment => ({
   ...appointment,
-  date: appointment.date.toISOString(), // Convert Date to ISO string
+  startTime: appointment.startTime.toISOString(), // Convert Date to ISO string
+  endTime: appointment.endTime.toISOString()
 }));
 
 

@@ -19,7 +19,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   });
   return {
     props: { ...appointment,
-      date: appointment.date.toISOString()},
+      startTime: appointment.startTime.toISOString(),
+      endTime: appointment.endTime.toISOString()},
   };
 };
 

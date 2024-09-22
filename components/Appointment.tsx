@@ -11,7 +11,8 @@ export type AppointmentProps = {
     email: string;
   } | null;
   content: string;
-  date: string;
+  startTime: string;
+  endTime: string;
 };
 
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
@@ -26,7 +27,7 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
   >
       <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`}/>
       <CardContent>  
-        <ReactMarkdown children={new Date(appointment.date).toDateString()} />
+        <ReactMarkdown children={new Date(appointment.startTime).toDateString()} />
       </CardContent>
     </Card>
   );

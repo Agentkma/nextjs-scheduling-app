@@ -11,20 +11,54 @@ datasource db {
 }
 
 model Appointment {
-  id        String     @default(cuid()) @id
-  title     String
-  content   String?
-  date      DateTime
-  userId    String?   // Foreign key to User
-  user      User?     @relation(fields: [userId], references: [id])
+  id                  String     @default(cuid()) @id
+  title               String
+  content             String?
+  startTime           DateTime   @unique
+  endTime             DateTime   @unique
+  userId              String?   // Foreign key to User
+  user                User?      @relation(fields: [userId], references: [id])
 }
 
 model User {
-  id            String       @default(cuid()) @id
+  id            String        @default(cuid()) @id
   name          String?
-  email         String?   @unique
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  email         String?       @unique
+  createdAt     DateTime      @default(now()) @map(name: "created_at")
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
   appointments  Appointment[]
+  accounts      Account[]
+  emailVerified DateTime?
+  image         String?
+  sessions      Session[]
   @@map(name: "users")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+
+  user User @relation(fields:[userId], references:[id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique@map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields:[userId], references:[id], onDelete: Cascade)
 }
