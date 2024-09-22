@@ -26,7 +26,7 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
   >
       <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`}/>
       <CardContent>  
-        <ReactMarkdown children={appointment.content} />
+        <ReactMarkdown children={new Date(appointment.date).toDateString()} />
       </CardContent>
     </Card>
   );

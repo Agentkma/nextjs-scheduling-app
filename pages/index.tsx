@@ -3,7 +3,7 @@ import { GetStaticProps } from "next"
 import Layout from "../components/Layout"
 import Appointment, { AppointmentProps } from "../components/Appointment"
 import prisma from '../lib/prisma';
-import { Typography } from "@mui/material";
+import { Container, Paper, Typography } from "@mui/material";
 
 
 
@@ -37,16 +37,14 @@ type Props = {
 const Blog: React.FC<Props> = (props) => {
   return (
     <Layout>
-      <div className="page">
-        <Typography variant="h2">Appointments</Typography>
-        <main>
+      <Container>
+        <Typography variant='h6'>Appointments</Typography>
+        <Paper>
           {props.schedule.map((appointment) => (
-            <div key={appointment.id} className="post">
-              <Appointment appointment={appointment} />
-            </div>
+              <Appointment appointment={appointment} key={appointment.id}/>
           ))}
-        </main>
-      </div>
+        </Paper>
+      </Container>
     </Layout>
   )
 }

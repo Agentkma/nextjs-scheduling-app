@@ -1,59 +1,38 @@
 import React from "react"
 import { GetServerSideProps } from "next"
 import ReactMarkdown from "react-markdown"
+import prisma from '../../lib/prisma';
 import Layout from "../../components/Layout"
 import { AppointmentProps } from "../../components/Appointment"
+import { Container, Typography } from "@mui/material";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const appointment = {
-    id: "1",
-    title: "Prisma is the perfect ORM for Next.js",
-    content: "[Prisma](https://github.com/prisma/prisma) and Next.js go _great_ together!",
-    published: false,
-    author: {
-      name: "Nikolas Burk",
-      email: "burk@prisma.io",
+  const appointment = await prisma.appointment.findUnique({
+    where: {
+      id: String(params?.id),
     },
-  }
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
+  });
   return {
-    props: appointment,
-  }
-}
+    props: { ...appointment,
+      date: appointment.date.toISOString()},
+  };
+};
 
 const Appointment: React.FC<AppointmentProps> = (props) => {
-  let title = props.title
-
-    title = `${title} (Draft)`
-  
 
   return (
     <Layout>
-      <div>
-        <h2>{title}</h2>
-        <p>By {props?.user?.name || "Unknown user"}</p>
+      <Container>
+        <Typography variant='h6'>{props.title}</Typography>
+        <Typography variant='body2'>By {props?.user?.name || "Unknown user"}</Typography>
         <ReactMarkdown children={props.content} />
-      </div>
-      <style jsx>{`
-        .page {
-          background: white;
-          padding: 2rem;
-        }
+      </Container>
 
-        .actions {
-          margin-top: 2rem;
-        }
-
-        button {
-          background: #ececec;
-          border: 0;
-          border-radius: 0.125rem;
-          padding: 1rem 2rem;
-        }
-
-        button + button {
-          margin-left: 1rem;
-        }
-      `}</style>
     </Layout>
   )
 }
