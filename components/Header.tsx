@@ -2,6 +2,7 @@ import React from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { signOut, useSession } from 'next-auth/react';
+import { Session } from 'next-auth';
 
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AppBar from '@mui/material/AppBar';
@@ -11,7 +12,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import { Session } from 'next-auth';
 import { Grid2 } from '@mui/material';
 
 const getLoginButtonText = (status: 'authenticated' | 'loading' | 'unauthenticated', session: Session) => {
