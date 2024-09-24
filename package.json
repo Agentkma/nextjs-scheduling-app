@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "next",
-    "build": "npm install $NPM_FLAGS && next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start"
   },
   "keywords": [],
