@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import { Session } from "next-auth";
-import { Grid2, Stack } from "@mui/material";
+import { Grid2,  } from "@mui/material";
 
 
 {/* <style jsx>{`
@@ -81,7 +81,7 @@ const loginButtonText =getLoginButtonText(status, session)
        {session &&  (
           <>
           <Link href="/" component={NextLink} data-active={isActive("/")} color='inherit' underline="hover">Appointments</Link>
-          <Link href="/create" component={NextLink} data-active={isActive("/create")} color='inherit' underline="hover">Schedule Now</Link></>
+          <Link href="/create" component={NextLink} data-active={isActive("/create")} color='inherit' underline="hover">New</Link></>
        )}
         </Grid2>
         {session && 
@@ -92,7 +92,7 @@ const loginButtonText =getLoginButtonText(status, session)
             </Button>
           </Grid2>
         }
-      {!session &&  <NextLink  href="/api/auth/signin"><Button  variant='outlined'data-active={isActive('/signup')}>{loginButtonText}</Button></NextLink>}
+      {!session &&  <NextLink  href="/api/auth/signin"><Button color="inherit" variant='outlined'data-active={isActive('/signup')}>{loginButtonText}</Button></NextLink>}
       </Toolbar>
     </AppBar>
   </Box>)

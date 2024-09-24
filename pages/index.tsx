@@ -17,10 +17,10 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   });
 
-// Convert Date objects to strings
+
 const serializedSchedule = schedule.map(appointment => ({
   ...appointment,
-  startTime: appointment.startTime.toISOString(), // Convert Date to ISO string
+  startTime: appointment.startTime.toISOString(), 
   endTime: appointment.endTime.toISOString()
 }));
 
@@ -39,7 +39,7 @@ const Blog: React.FC<Props> = (props) => {
   return (
     <Layout>
       <Container>
-        <Typography variant='h6'>Appointments</Typography>
+        <Typography variant='h6' sx={{my:2}}>Appointments</Typography>
         <Paper>
           {props.schedule.map((appointment) => (
               <Appointment appointment={appointment} key={appointment.id}/>

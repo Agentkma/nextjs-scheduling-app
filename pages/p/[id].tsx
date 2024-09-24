@@ -7,6 +7,8 @@ import { AppointmentProps } from "../../components/Appointment"
 import { Container, Typography } from "@mui/material";
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+
+  
   const appointment = await prisma.appointment.findUnique({
     where: {
       id: String(params?.id),
@@ -30,7 +32,9 @@ const Appointment: React.FC<AppointmentProps> = (props) => {
     <Layout>
       <Container>
         <Typography variant='h6'>{props.title}</Typography>
-        <Typography variant='body2'>By {props?.user?.name || "Unknown user"}</Typography>
+        <Typography variant='body2'>{props.content}</Typography>
+        <Typography variant='body2'>{props.startTime}</Typography>
+        <Typography variant='body2'>{props.endTime}</Typography>
         <ReactMarkdown children={props.content} />
       </Container>
 
