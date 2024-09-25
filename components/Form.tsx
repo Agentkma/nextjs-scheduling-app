@@ -65,6 +65,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
       });
       await Router.push('/');
     } catch (error) {
+      // !FIXME show user error
       console.error(error);
     }
   };
