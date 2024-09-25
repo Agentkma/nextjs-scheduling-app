@@ -1,7 +1,8 @@
 import React from 'react';
 import Router from 'next/router';
 import ReactMarkdown from 'react-markdown';
-import { Card, CardContent, CardHeader } from '@mui/material';
+import { Alert, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
+import { useSession } from 'next-auth/react';
 
 export type AppointmentProps = {
   id: string;
@@ -15,14 +16,32 @@ export type AppointmentProps = {
   endTime: string;
 };
 
+async function deleteAppointment(id: string): Promise<void> {
+  await fetch(`/api/appointment/${id}`, {
+    method: 'DELETE',
+  });
+  Router.push('/');
+}
+
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
+  const { data: session, status } = useSession();
+  if (status === 'loading') {
+    return (
+      <Alert variant="outlined" severity="info">
+        Authenticating ...
+      </Alert>
+    );
+  }
   const userName = appointment.user ? appointment.user.name : 'Unknown user';
+  const isUserSessionValid = Boolean(session);
+  const isAppointUsers = session?.user?.email === appointment.user?.email;
+
+  const handleDeleteAppointment = async () => deleteAppointment(appointment.id);
+
   return (
     <Card
-      onClick={() => Router.push('/p/[id]', `/p/${appointment.id}`)}
       sx={{
         '&:hover': {
-          cursor: 'pointer',
           boxShadow: '1px 1px 6px #aaa',
         },
       }}
@@ -31,6 +50,12 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
       <CardContent>
         <ReactMarkdown children={new Date(appointment.startTime).toDateString()} />
       </CardContent>
+      {isUserSessionValid && isAppointUsers && (
+        <CardActions>
+          <Button onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>Edit</Button>
+          <Button onClick={handleDeleteAppointment}>Delete</Button>
+        </CardActions>
+      )}
     </Card>
   );
 };
