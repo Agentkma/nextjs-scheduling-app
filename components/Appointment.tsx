@@ -48,7 +48,7 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
     >
       <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`} />
       <CardContent>
-        <ReactMarkdown children={new Date(appointment.startTime).toDateString()} />
+        <ReactMarkdown>{new Date(appointment.startTime).toDateString()}</ReactMarkdown>
       </CardContent>
       {isUserSessionValid && isAppointUsers && (
         <CardActions>
