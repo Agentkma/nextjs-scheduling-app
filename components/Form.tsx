@@ -13,7 +13,13 @@ const schema = object({
   title: string().required(),
   content: string().required(),
   startTime: string().required(),
-  endTime: string().required(),
+  // endTime: string().required(),
+  endTime: string().when('startTime', {
+    //@ts-ignore
+    is: (startTime: string): boolean => !!startTime, // Check if startTime is valid
+    then: string().required('endTime is required when startTime is provided'),
+    otherwise: string().notRequired(),
+  }),
 });
 
 const errorMessageMap = {
