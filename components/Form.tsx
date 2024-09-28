@@ -1,48 +1,29 @@
 import React, { useState } from 'react';
 import Router from 'next/router';
-import { Button, Grid2, TextField, Typography } from '@mui/material';
+import { Alert, Button, Grid2, TextField, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import { AppointmentProps } from './Appointment';
 import { object, string, InferType } from 'yup';
 import { useFormik } from 'formik';
 
-//!FIXME: schema needs to be dynamic so we can check start/end times
 const schema = object({
   title: string().required(),
   content: string().required(),
   startTime: string().required(),
   endTime: string().required(),
 });
-type FormValues = InferType<typeof schema>;
-const BasicDateTimePicker = ({
-  label,
-  isDisabled,
-  onChange,
-  value,
-  minDateTime,
-}: {
-  label: string;
-  onChange: DateTimePickerProps<Dayjs>['onChange'];
-  isDisabled?: boolean;
-  value: Dayjs;
-  minDateTime?: Dayjs;
-}) => {
-  return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DateTimePicker
-        label={label}
-        disablePast
-        disabled={isDisabled}
-        onChange={onChange}
-        value={value}
-        minDateTime={minDateTime}
-      />
-    </LocalizationProvider>
-  );
+
+const errorMessageMap = {
+  minDate: 'Please select a later date',
+  minTime: 'Please select a later time',
+  disablePast: 'Please select a time in the future',
 };
+
+type FormValues = InferType<typeof schema>;
+
 type FormProps = {
   initialValues?: Pick<AppointmentProps, 'title' | 'content' | 'startTime' | 'endTime' | 'id'>;
 };
@@ -53,13 +34,13 @@ const getInitialValues = (initialValues?: FormProps['initialValues']) =>
     startTime: null,
     endTime: null,
   };
+
 const Form: React.FC<FormProps> = ({ initialValues }) => {
-  // const [title, setTitle] = useState(initialValues?.title ?? '');
-  // const [content, setContent] = useState(initialValues?.content ?? '');
-  // const [startTime, setStartTime] = useState<Dayjs | null>(
-  //   initialValues?.startTime ? dayjs(initialValues.startTime) : null,
-  // );
-  // const [endTime, setEndTime] = useState<Dayjs | null>(initialValues?.endTime ? dayjs(initialValues.endTime) : null);
+  const [dateValidationMessage, setDateValidationMessage] = useState<{ startTime: string; endTime: string }>({
+    startTime: '',
+    endTime: '',
+  });
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSubmit = async (formValues: FormValues) => {
     try {
@@ -73,6 +54,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
 
         return;
       }
+      // !FIXME: error is not being thrown/catch here
       await fetch('/api/appointment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -80,8 +62,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
       });
       await Router.push('/');
     } catch (error) {
-      // !FIXME show user error
-      console.error(error);
+      setSaveError('There was an error saving the appointment.');
     }
   };
 
@@ -100,7 +81,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
     }
   };
   const handleEndTimeChange: DateTimePickerProps<Dayjs>['onChange'] = (value) => {
-    formik.setFieldValue('endTime', value);
+    formik.setFieldValue('endTime', value, false);
   };
 
   return (
@@ -108,6 +89,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
       <Typography variant="h6" sx={{ my: 2 }}>
         {`${initialValues ? 'Edit' : 'New'} Appointment`}
       </Typography>
+      {saveError && <Alert severity="error">{saveError}</Alert>}
       <Grid2 container spacing={2}>
         <Grid2 size={8}>
           <TextField
@@ -118,6 +100,8 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
             placeholder="Title"
             type="text"
             value={formik.values.title}
+            helperText={formik.touched.title && formik.errors.title}
+            error={!!formik.touched.title && !!formik.errors.title}
           />
         </Grid2>
         <Grid2 size={8}>
@@ -129,17 +113,54 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
             value={formik.values.content}
             multiline
             name="content"
+            helperText={formik.errors.content}
+            error={!!formik.touched.content && !!formik.errors.content}
           />
         </Grid2>
         <Grid2 size={8} container spacing={2}>
-          <BasicDateTimePicker label="Start Time" onChange={handleStartTimeChange} value={formik.values.startTime} />{' '}
-          <BasicDateTimePicker
-            label="End Time"
-            onChange={handleEndTimeChange}
-            isDisabled={!formik.values.startTime}
-            value={formik.values.endTime}
-            minDateTime={formik.values.startTime?.add(15, 'minute')}
-          />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              label="Start Time"
+              disablePast
+              onChange={handleStartTimeChange}
+              value={formik.values.startTime}
+              slotProps={{
+                textField: {
+                  helperText: dateValidationMessage.startTime || formik.errors.startTime || '',
+                  error: !!dateValidationMessage.startTime || !!(formik.touched.startTime && formik.errors.startTime),
+                },
+              }}
+              onError={(newError) =>
+                setDateValidationMessage((prevState) => ({
+                  ...prevState,
+                  startTime: errorMessageMap?.[newError] ?? newError,
+                }))
+              }
+            />
+          </LocalizationProvider>
+
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              label="End Time"
+              disablePast
+              disabled={!formik.values.startTime}
+              onChange={handleEndTimeChange}
+              value={formik.values.endTime}
+              minDateTime={formik.values.startTime?.add(15, 'minute')}
+              slotProps={{
+                textField: {
+                  helperText: dateValidationMessage.endTime || (formik.touched.endTime && formik.errors.endTime) || '',
+                  error: !!dateValidationMessage.endTime || !!(formik.touched.endTime && formik.errors.endTime),
+                },
+              }}
+              onError={(newError) =>
+                setDateValidationMessage((prevState) => ({
+                  ...prevState,
+                  endTime: errorMessageMap?.[newError] ?? newError,
+                }))
+              }
+            />
+          </LocalizationProvider>
         </Grid2>
         <Grid2 size={8} container spacing={2}>
           <Button disabled={!formik.isValid} type="submit" variant="outlined" color="success">
