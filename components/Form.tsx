@@ -6,8 +6,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { AppointmentProps } from './Appointment';
-import { object, string, InferType } from 'yup';
+import { object, string } from 'yup';
 import { useFormik } from 'formik';
+import { LoadingButton } from '@mui/lab';
 
 const schema = object({
   title: string().required(),
@@ -96,7 +97,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        {`${initialValues ? 'Edit' : 'New'} Appointment`}
+        {`${initialValues ? 'Edit' : 'Add'} Appointment`}
       </Typography>
       {saveError && <Alert severity="error">{saveError}</Alert>}
       <Grid2 container spacing={2}>
@@ -172,9 +173,15 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
           </LocalizationProvider>
         </Grid2>
         <Grid2 size={8} container spacing={2}>
-          <Button disabled={!formik.isValid} type="submit" variant="outlined" color="success">
+          <LoadingButton
+            disabled={!formik.isValid}
+            loading={formik.isSubmitting}
+            type="submit"
+            variant="outlined"
+            color="success"
+          >
             {initialValues ? 'Save' : 'Create'}
-          </Button>
+          </LoadingButton>
           <Button href="#" onClick={() => Router.push('/')} color="error">
             Cancel
           </Button>

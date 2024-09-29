@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { signOut, useSession } from 'next-auth/react';
@@ -47,18 +47,24 @@ const Header: React.FC = () => {
             </Typography>
             {session && (
               <>
-                <Link href="/" component={NextLink} data-active={isActive('/')} color="inherit" underline="hover">
-                  Appointments
-                </Link>
-                <Link
-                  href="/create"
-                  component={NextLink}
-                  data-active={isActive('/create')}
-                  color="inherit"
-                  underline="hover"
-                >
-                  Add +
-                </Link>
+                <NextLink href="/">
+                  <Button
+                    color="inherit"
+                    variant="text"
+                    sx={{ textDecoration: isActive('/') ? 'underline' : 'none', textUnderlineOffset: 4 }}
+                  >
+                    Appointments
+                  </Button>
+                </NextLink>
+                <NextLink href="/create">
+                  <Button
+                    color="inherit"
+                    variant="text"
+                    sx={{ textDecoration: isActive('/create') ? 'underline' : 'none', textUnderlineOffset: 4 }}
+                  >
+                    + Add
+                  </Button>
+                </NextLink>
               </>
             )}
           </Grid2>

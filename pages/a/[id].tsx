@@ -12,7 +12,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
     include: {
       user: {
-        select: { name: true },
+        select: { name: true, email: true },
       },
     },
   });

@@ -1,47 +1,74 @@
 import React from 'react';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Layout from '../components/Layout';
 import Appointment, { AppointmentProps } from '../components/Appointment';
 import prisma from '../lib/prisma';
-import { Typography } from '@mui/material';
+import { Alert, Typography } from '@mui/material';
+import { getSession, useSession } from 'next-auth/react';
 
-export const getStaticProps: GetStaticProps = async () => {
-  const schedule = await prisma.appointment.findMany({
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await getSession({ req });
+  if (!session) {
+    res.statusCode = 403;
+    return { props: { appointments: [] } };
+  }
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      user: { email: session.user.email },
+    },
     include: {
       user: {
-        select: { email: true },
+        select: { name: true, email: true },
       },
     },
   });
-
-  const serializedSchedule = schedule.map((appointment) => ({
-    ...appointment,
-    startTime: appointment.startTime.toISOString(),
-    endTime: appointment.endTime.toISOString(),
-  }));
-
   return {
-    props: { schedule: serializedSchedule },
-    revalidate: 10,
+    props: {
+      appointments: appointments.map((a) => ({
+        ...a,
+        startTime: a.startTime.toISOString(),
+        endTime: a.endTime.toISOString(),
+      })),
+    },
   };
 };
 
 type Props = {
-  schedule: AppointmentProps[];
+  appointments: AppointmentProps[];
 };
 
-const Blog: React.FC<Props> = (props) => {
+const Home: React.FC<Props> = (props) => {
+  const { data: session, status } = useSession();
+
+  if (status === 'loading') {
+    return <Alert>Authenticating...</Alert>;
+  }
+
+  if (session) {
+    return (
+      <Layout>
+        <Typography variant="h6" sx={{ my: 2 }}>
+          Appointments
+        </Typography>
+
+        {props.appointments.map((appointment) => (
+          <Appointment appointment={appointment} key={appointment.id} />
+        ))}
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Typography variant="h6" sx={{ my: 2 }}>
-        Appointments
+        Let's Schedule .....Pal!
       </Typography>
-
-      {props.schedule.map((appointment) => (
-        <Appointment appointment={appointment} key={appointment.id} />
-      ))}
+      <Typography variant="body2" sx={{ my: 2 }}>
+        Login to begin.
+      </Typography>
     </Layout>
   );
 };
 
-export default Blog;
+export default Home;
