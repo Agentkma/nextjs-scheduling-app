@@ -57,7 +57,7 @@ const Header: React.FC = () => {
                   color="inherit"
                   underline="hover"
                 >
-                  New
+                  Add +
                 </Link>
               </>
             )}

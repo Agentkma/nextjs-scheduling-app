@@ -4,7 +4,7 @@ import { Alert, Button, Grid2, TextField, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { AppointmentProps } from './Appointment';
 import { object, string, InferType } from 'yup';
 import { useFormik } from 'formik';
@@ -13,13 +13,7 @@ const schema = object({
   title: string().required(),
   content: string().required(),
   startTime: string().required(),
-  // endTime: string().required(),
-  endTime: string().when('startTime', {
-    //@ts-ignore
-    is: (startTime: string): boolean => !!startTime, // Check if startTime is valid
-    then: string().required('endTime is required when startTime is provided'),
-    otherwise: string().notRequired(),
-  }),
+  endTime: string().required(),
 });
 
 const errorMessageMap = {
@@ -28,18 +22,27 @@ const errorMessageMap = {
   disablePast: 'Please select a time in the future',
 };
 
-type FormValues = InferType<typeof schema>;
-
 type FormProps = {
-  initialValues?: Pick<AppointmentProps, 'title' | 'content' | 'startTime' | 'endTime' | 'id'>;
+  initialValues?: Pick<AppointmentProps, 'title' | 'content' | 'id' | 'startTime' | 'endTime'>;
+};
+
+type FormValues = Pick<AppointmentProps, 'title' | 'content'> & {
+  startTime: Dayjs | null;
+  endTime: Dayjs | null;
 };
 const getInitialValues = (initialValues?: FormProps['initialValues']) =>
-  initialValues ?? {
-    title: '',
-    content: '',
-    startTime: null,
-    endTime: null,
-  };
+  initialValues
+    ? {
+        ...initialValues,
+        startTime: dayjs(initialValues.startTime),
+        endTime: dayjs(initialValues.endTime),
+      }
+    : {
+        title: '',
+        content: '',
+        startTime: null,
+        endTime: null,
+      };
 
 const Form: React.FC<FormProps> = ({ initialValues }) => {
   const [dateValidationMessage, setDateValidationMessage] = useState<{ startTime: string; endTime: string }>({
@@ -60,7 +63,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
 
         return;
       }
-      // !FIXME: error is not being thrown/catch here
+
       await fetch('/api/appointment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,7 +90,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
     }
   };
   const handleEndTimeChange: DateTimePickerProps<Dayjs>['onChange'] = (value) => {
-    formik.setFieldValue('endTime', value, false);
+    formik.setFieldValue('endTime', value);
   };
 
   return (
@@ -170,7 +173,7 @@ const Form: React.FC<FormProps> = ({ initialValues }) => {
         </Grid2>
         <Grid2 size={8} container spacing={2}>
           <Button disabled={!formik.isValid} type="submit" variant="outlined" color="success">
-            {initialValues ? 'Create' : 'Save'}
+            {initialValues ? 'Save' : 'Create'}
           </Button>
           <Button href="#" onClick={() => Router.push('/')} color="error">
             Cancel

@@ -1,7 +1,7 @@
 import React from 'react';
 import Router from 'next/router';
 import ReactMarkdown from 'react-markdown';
-import { Alert, Button, Card, CardActions, CardContent, CardHeader } from '@mui/material';
+import { Alert, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
 import { useSession } from 'next-auth/react';
 
 export type AppointmentProps = {
@@ -34,6 +34,7 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
   }
   const userName = appointment.user ? appointment.user.name : 'Unknown user';
   const isUserSessionValid = Boolean(session);
+
   const isAppointUsers = session?.user?.email === appointment.user?.email;
 
   const handleDeleteAppointment = async () => deleteAppointment(appointment.id);
@@ -44,16 +45,23 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
         '&:hover': {
           boxShadow: '1px 1px 6px #aaa',
         },
+        my: 2,
       }}
     >
       <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`} />
       <CardContent>
-        <ReactMarkdown>{new Date(appointment.startTime).toDateString()}</ReactMarkdown>
+        <Typography>{appointment.content}</Typography>
+        <Typography>Start : {new Date(appointment.startTime).toDateString()}</Typography>
+        <Typography>End : {new Date(appointment.endTime).toDateString()}</Typography>
       </CardContent>
       {isUserSessionValid && isAppointUsers && (
         <CardActions>
-          <Button onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>Edit</Button>
-          <Button onClick={handleDeleteAppointment}>Delete</Button>
+          <Button variant="outlined" color="info" onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>
+            Edit
+          </Button>
+          <Button onClick={handleDeleteAppointment} color="error">
+            Delete
+          </Button>
         </CardActions>
       )}
     </Card>
