@@ -10,14 +10,14 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-model Appointment {
-  id                  String     @default(cuid()) @id
-  title               String
-  content             String?
-  startTime           DateTime   @unique
-  endTime             DateTime   @unique
-  userId              String?   // Foreign key to User
-  user                User?      @relation(fields: [userId], references: [id])
+model TimeWindow {
+  id            Int          @id @default(autoincrement())
+  startTime     DateTime
+  endTime       DateTime
+  scheduleId    Int
+  appointmentId Int?
+  schedule      Schedule     @relation(fields: [scheduleId], references: [id])
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 }
 
 model User {
@@ -26,12 +26,46 @@ model User {
   email         String?       @unique
   createdAt     DateTime      @default(now()) @map(name: "created_at")
   updatedAt     DateTime      @updatedAt @map(name: "updated_at")
-  appointments  Appointment[]
   accounts      Account[]
   emailVerified DateTime?
   image         String?
   sessions      Session[]
+  userRole      UserRole     
+  schedules     Schedule[]    @relation("ProviderSchedules")
+  appointments  Appointment[] @relation("ClientAppointments")
   @@map(name: "users")
+}
+
+enum UserRole {
+  CLIENT
+  PROVIDER
+}
+
+model Schedule {
+  id          Int           @id @default(autoincrement())
+  providerId  String
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  timeWindows TimeWindow[]
+  provider    User          @relation(fields: [providerId], references: [id], name: "ProviderSchedules")
+  appointments Appointment[]
+}
+
+model Appointment {
+  id          Int           @id @default(autoincrement())
+  clientId    String
+  scheduleId  Int
+  startTime   DateTime
+  endTime     DateTime
+  confirmed   Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  expiresAt   DateTime
+  client      User          @relation(fields: [clientId], references: [id], name: "ClientAppointments")
+  schedule    Schedule      @relation(fields: [scheduleId], references: [id])
+  timeWindows TimeWindow[]
+
+  @@index([clientId, scheduleId], name: "appointment_unique")
 }
 
 model Account {
