@@ -17,6 +17,8 @@ import {
 import { getSession, useSession } from 'next-auth/react';
 import TimeWindow from '../ui/TimeWindow';
 
+export type CreateAppointmentBody = { clientId: string; scheduleId: number; startTime: string; endTime: string };
+
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession({ req });
   if (!session) {
@@ -152,7 +154,7 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
       setSelectedProvider(provider);
     }
   };
-  const handleCreateAppointment = async ({ clientId, scheduleId, startTime, endTime }) => {
+  const handleCreateAppointment = async ({ clientId, scheduleId, startTime, endTime }: CreateAppointmentBody) => {
     await fetch('/api/appointment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -216,7 +218,7 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
                       buttonProps={{
                         onClick: () =>
                           handleCreateAppointment({
-                            clientId: currentUser.id,
+                            clientId: currentUser.id.toString(),
                             scheduleId: tw.scheduleId,
                             startTime: tw.startTime,
                             endTime: tw.endTime,
