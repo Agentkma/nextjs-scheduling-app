@@ -17,8 +17,6 @@ import {
 import { getSession, useSession } from 'next-auth/react';
 import TimeWindow from '../ui/TimeWindow';
 
-// !FIXME migrate schema for correct props
-
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const session = await getSession({ req });
   if (!session) {
@@ -66,8 +64,21 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       },
     },
   });
+
+  const currentUser = await prisma.user.findUnique({
+    where: {
+      email: session.user.email,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  });
+
   return {
     props: {
+      currentUser,
       appointments: appointments.map((a) => ({
         ...a,
         startTime: a.startTime.toISOString(),
@@ -93,7 +104,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-// !FIXME update to new data
 type Provider = {
   id: string;
   name: string;
@@ -120,11 +130,12 @@ type Provider = {
   }[];
 };
 type Props = {
+  currentUser: { name: string; id: number; email: string };
   appointments: AppointmentProps[];
   providers: Provider[];
 };
 
-const Home: React.FC<Props> = ({ appointments, providers }) => {
+const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
   const providerMap = useMemo(() => {
     const initVal: Record<string, Provider> = {};
     return providers?.reduce((accum, p) => {
@@ -140,6 +151,18 @@ const Home: React.FC<Props> = ({ appointments, providers }) => {
     if (provider) {
       setSelectedProvider(provider);
     }
+  };
+  const handleCreateAppointment = async ({ clientId, scheduleId, startTime, endTime }) => {
+    await fetch('/api/appointment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId,
+        scheduleId,
+        startTime,
+        endTime,
+      }),
+    });
   };
 
   const { data: session, status } = useSession();
@@ -159,7 +182,6 @@ const Home: React.FC<Props> = ({ appointments, providers }) => {
             No appointments yet.
           </Typography>
         )}
-        // !FIXME : update Appointment to use TimeWindow component
         {appointments.map((appointment) => (
           <Appointment appointment={appointment} key={appointment.id} />
         ))}
@@ -192,8 +214,13 @@ const Home: React.FC<Props> = ({ appointments, providers }) => {
                       endTime={tw.endTime}
                       provider={{ name: selectedProvider.name }}
                       buttonProps={{
-                        // !FIXME: wire up to create an appointment
-                        onClick: ({ scheduleId }) => console.log('scheduleId', scheduleId),
+                        onClick: () =>
+                          handleCreateAppointment({
+                            clientId: currentUser.id,
+                            scheduleId: tw.scheduleId,
+                            startTime: tw.startTime,
+                            endTime: tw.endTime,
+                          }),
                         name: 'Reserve',
                       }}
                       scheduleId={s.id}

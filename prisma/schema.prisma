@@ -30,7 +30,7 @@ model User {
   emailVerified DateTime?
   image         String?
   sessions      Session[]
-  userRole      UserRole     
+  userRole      UserRole      @default(CLIENT)
   schedules     Schedule[]    @relation("ProviderSchedules")
   appointments  Appointment[] @relation("ClientAppointments")
   @@map(name: "users")

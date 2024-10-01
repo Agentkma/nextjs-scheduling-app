@@ -1,12 +1,13 @@
 import React from 'react';
 import Layout from '../components/Layout';
 
-import Form from '../components/Form';
+// import Form from '../components/Form';
 
 const Create: React.FC = () => {
   return (
     <Layout>
-      <Form />
+      {/* <Form /> */}
+      placeholder
     </Layout>
   );
 };
