@@ -1,19 +1,28 @@
 import React from 'react';
 import Router from 'next/router';
-import ReactMarkdown from 'react-markdown';
 import { Alert, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
 import { useSession } from 'next-auth/react';
 
 export type AppointmentProps = {
-  id: string;
-  title: string;
-  user: {
-    name: string;
-    email: string;
-  } | null;
-  content: string;
   startTime: string;
   endTime: string;
+  client: {
+    name: string;
+    email: string;
+  };
+  schedule: {
+    startTime: Date;
+    endTime: Date;
+    provider: {
+      name: string;
+    };
+  };
+  id: number;
+  clientId: string;
+  scheduleId: number;
+  confirmed: boolean;
+  createdAt: Date;
+  expiresAt: Date;
 };
 
 async function deleteAppointment(id: string): Promise<void> {

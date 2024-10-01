@@ -56,7 +56,7 @@ const Header: React.FC = () => {
                     Appointments
                   </Button>
                 </NextLink>
-                <NextLink href="/create">
+                {/* <NextLink href="/create">
                   <Button
                     color="inherit"
                     variant="text"
@@ -64,7 +64,7 @@ const Header: React.FC = () => {
                   >
                     + Add
                   </Button>
-                </NextLink>
+                </NextLink> */}
               </>
             )}
           </Grid2>
