@@ -25,11 +25,16 @@ export type AppointmentProps = {
   expiresAt: Date;
 };
 
-async function deleteAppointment(id: string): Promise<void> {
+async function patchAppointment({
+  id,
+  ...body
+}: Partial<Omit<AppointmentProps, 'schedule' | 'client'>>): Promise<void> {
   await fetch(`/api/appointment/${id}`, {
-    method: 'DELETE',
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
-  Router.push('/');
+  // Router.push('/');
 }
 
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
@@ -41,12 +46,16 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
       </Alert>
     );
   }
-  const userName = appointment.user ? appointment.user.name : 'Unknown user';
+  const providerName = appointment.schedule.provider.name ? appointment.client.name : 'Unknown user';
   const isUserSessionValid = Boolean(session);
 
-  const isAppointUsers = session?.user?.email === appointment.user?.email;
+  const isAppointUsers = session?.user?.email === appointment.client?.email;
 
-  const handleDeleteAppointment = async () => deleteAppointment(appointment.id);
+  const handleConfirmAppointment = async () => {
+    patchAppointment({ id: appointment.id, confirmed: true });
+  };
+
+  //!FIXME: use TimeWindow to here?  or should Appointment be modified to be used for TimeWindows
 
   return (
     <Card
@@ -65,11 +74,11 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
       </CardContent>
       {isUserSessionValid && isAppointUsers && (
         <CardActions>
-          <Button variant="outlined" color="info" onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>
+          {/* <Button variant="outlined" color="info" onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>
             Edit
-          </Button>
-          <Button onClick={handleDeleteAppointment} color="error">
-            Delete
+          </Button> */}
+          <Button onClick={handleConfirmAppointment} color="error">
+            Confirm
           </Button>
         </CardActions>
       )}
