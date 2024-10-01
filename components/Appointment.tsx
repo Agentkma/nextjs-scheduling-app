@@ -1,7 +1,8 @@
 import React from 'react';
-import Router from 'next/router';
-import { Alert, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+
+import { Alert } from '@mui/material';
 import { useSession } from 'next-auth/react';
+import TimeWindow from '../ui/TimeWindow';
 
 export type AppointmentProps = {
   startTime: string;
@@ -34,7 +35,6 @@ async function patchAppointment({
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  // Router.push('/');
 }
 
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
@@ -46,43 +46,35 @@ const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appoint
       </Alert>
     );
   }
-  const providerName = appointment.schedule.provider.name ? appointment.client.name : 'Unknown user';
+
   const isUserSessionValid = Boolean(session);
 
-  const isAppointUsers = session?.user?.email === appointment.client?.email;
+  const isUsersAppointment = session?.user?.email === appointment.client?.email;
+
+  if (!isUsersAppointment) {
+    return null;
+  }
 
   const handleConfirmAppointment = async () => {
-    patchAppointment({ id: appointment.id, confirmed: true });
+    if (isUserSessionValid) {
+      patchAppointment({ id: appointment.id, confirmed: true });
+    }
   };
 
-  //!FIXME: use TimeWindow to here?  or should Appointment be modified to be used for TimeWindows
-
   return (
-    <Card
-      sx={{
-        '&:hover': {
-          boxShadow: '1px 1px 6px #aaa',
+    <TimeWindow
+      subheader={<>{`Appointment for:  ${appointment.client.name}`}</>}
+      startTime={appointment.startTime}
+      endTime={appointment.endTime}
+      provider={{ name: appointment.schedule.provider.name }}
+      {...(!appointment.confirmed && {
+        buttonProps: {
+          onClick: handleConfirmAppointment,
+          name: 'Reserve',
         },
-        my: 2,
-      }}
-    >
-      <CardHeader title={appointment.title} subheader={`Appointment for:  ${userName}`} />
-      <CardContent>
-        <Typography>{appointment.content}</Typography>
-        <Typography>Start : {new Date(appointment.startTime).toDateString()}</Typography>
-        <Typography>End : {new Date(appointment.endTime).toDateString()}</Typography>
-      </CardContent>
-      {isUserSessionValid && isAppointUsers && (
-        <CardActions>
-          {/* <Button variant="outlined" color="info" onClick={() => Router.push('/a/[id]', `/a/${appointment.id}`)}>
-            Edit
-          </Button> */}
-          <Button onClick={handleConfirmAppointment} color="error">
-            Confirm
-          </Button>
-        </CardActions>
-      )}
-    </Card>
+      })}
+      scheduleId={appointment.scheduleId}
+    />
   );
 };
 

@@ -15,6 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { getSession, useSession } from 'next-auth/react';
+import TimeWindow from '../ui/TimeWindow';
 
 // !FIXME migrate schema for correct props
 
@@ -59,6 +60,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
       appointments: true,
       schedules: {
         select: {
+          id: true,
           timeWindows: true,
         },
       },
@@ -97,11 +99,12 @@ type Provider = {
   name: string;
   email: string;
   schedules: {
+    id: number;
     timeWindows: {
       id: number;
       scheduleId: number;
-      startTime: Date;
-      endTime: Date;
+      startTime: string;
+      endTime: string;
       appointmentId: number | null;
     }[];
   }[];
@@ -112,8 +115,8 @@ type Provider = {
     clientId: string;
     scheduleId: number;
     confirmed: boolean;
-    createdAt: Date;
-    expiresAt: Date;
+    createdAt: string;
+    expiresAt: string;
   }[];
 };
 type Props = {
@@ -183,7 +186,19 @@ const Home: React.FC<Props> = ({ appointments, providers }) => {
             selectedProvider.schedules.map((s) =>
               s.timeWindows.reduce((accum, tw) => {
                 if (!tw.appointmentId) {
-                  accum.push(<TimeWindow timeWindow={tw} />);
+                  accum.push(
+                    <TimeWindow
+                      startTime={tw.startTime}
+                      endTime={tw.endTime}
+                      provider={{ name: selectedProvider.name }}
+                      buttonProps={{
+                        // !FIXME: wire up to create an appointment
+                        onClick: ({ scheduleId }) => console.log('scheduleId', scheduleId),
+                        name: 'Reserve',
+                      }}
+                      scheduleId={s.id}
+                    />,
+                  );
                 }
                 return accum;
               }, []),
