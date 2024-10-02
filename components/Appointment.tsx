@@ -38,14 +38,7 @@ async function patchAppointment({
 }
 
 const AppointmentProps: React.FC<{ appointment: AppointmentProps }> = ({ appointment }) => {
-  const { data: session, status } = useSession();
-  if (status === 'loading') {
-    return (
-      <Alert variant="outlined" severity="info">
-        Authenticating ...
-      </Alert>
-    );
-  }
+  const { data: session } = useSession();
 
   const isUserSessionValid = Boolean(session);
 
