@@ -6,7 +6,7 @@ import { CreateAppointmentBody } from '../..';
 
 export default async function handle(req, res) {
   const { clientId, scheduleId, startTime, endTime }: CreateAppointmentBody = req.body;
-
+ 
   const result = await prisma.appointment.create({
     data: {
       clientId,

@@ -56,15 +56,6 @@ const Header: React.FC = () => {
                     Appointments
                   </Button>
                 </NextLink>
-                {/* <NextLink href="/create">
-                  <Button
-                    color="inherit"
-                    variant="text"
-                    sx={{ textDecoration: isActive('/create') ? 'underline' : 'none', textUnderlineOffset: 4 }}
-                  >
-                    + Add
-                  </Button>
-                </NextLink> */}
               </>
             )}
           </Grid2>

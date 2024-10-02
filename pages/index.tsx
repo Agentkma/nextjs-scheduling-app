@@ -12,6 +12,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Stack,
   Typography,
 } from '@mui/material';
 import { getSession, useSession } from 'next-auth/react';
@@ -155,16 +156,21 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
     }
   };
   const handleCreateAppointment = async ({ clientId, scheduleId, startTime, endTime }: CreateAppointmentBody) => {
-    await fetch('/api/appointment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        clientId,
-        scheduleId,
-        startTime,
-        endTime,
-      }),
-    });
+  
+    try {
+      await fetch('/api/appointment/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          scheduleId,
+          startTime,
+          endTime,
+        }),
+      });
+    } catch (error) {
+      console.warn('failed to create appointment', error);
+    }
   };
 
   const { data: session, status } = useSession();
@@ -180,9 +186,9 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
           Appointments
         </Typography>
         {!appointments.length && (
-          <Typography variant="body2" sx={{ my: 2 }}>
+          <Alert severity="info" sx={{ my: 2 }}>
             No appointments yet.
-          </Typography>
+          </Alert>
         )}
         {appointments.map((appointment) => (
           <Appointment appointment={appointment} key={appointment.id} />
@@ -197,7 +203,7 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
             <Select
               labelId="select-label-provider"
               id="select-label-provider"
-              value={selectedProvider.id}
+              value={selectedProvider?.id ?? ''}
               label="Provider"
               onChange={handleChange}
             >
@@ -212,6 +218,7 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
                 if (!tw.appointmentId) {
                   accum.push(
                     <TimeWindow
+                      key={tw.id}
                       startTime={tw.startTime}
                       endTime={tw.endTime}
                       provider={{ name: selectedProvider.name }}
@@ -239,12 +246,20 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
 
   return (
     <Layout>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        Let's Schedule .....Pal!
-      </Typography>
-      <Typography variant="body2" sx={{ my: 2 }}>
-        Login to begin.
-      </Typography>
+      <Stack
+        sx={{
+          height: '100vh',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h1" sx={{ my: 2 }}>
+          Let's Schedule .....Pal!
+        </Typography>
+        <Typography variant="h6" sx={{ my: 2 }}>
+          Login to begin.
+        </Typography>
+      </Stack>
     </Layout>
   );
 };
