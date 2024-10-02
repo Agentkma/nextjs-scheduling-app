@@ -1,5 +1,6 @@
 import prisma from '../../../lib/prisma';
 
+// TODO: add logic to delete appointment if not confirmed within 30 minutes after creation
 export default async function handle(req, res) {
   const appointment = req.query.id;
   if (req.method === 'DELETE') {

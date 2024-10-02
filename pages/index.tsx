@@ -56,6 +56,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   });
 
+  // TODO: filter for schedules that are 24 hours in the future
+
   const providersWithDetails = await prisma.user.findMany({
     where: {
       userRole: 'PROVIDER',
@@ -144,7 +146,9 @@ type Props = {
   providers: Provider[];
 };
 
-const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
+// TODO: make views/components mobile friendly
+
+const Appointments: React.FC<Props> = ({ currentUser, appointments, providers }) => {
   const providerMap = useMemo(() => {
     const initVal: Record<string, Provider> = {};
     return providers?.reduce((accum, p) => {
@@ -277,4 +281,4 @@ const Home: React.FC<Props> = ({ currentUser, appointments, providers }) => {
   );
 };
 
-export default Home;
+export default Appointments;
