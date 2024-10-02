@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Alert, Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardHeader, Typography } from '@mui/material';
 
 export type TimeWindowProps = {
   startTime: string;
@@ -42,8 +42,22 @@ const TimeWindowProps: React.FC<TimeWindowProps> = ({
         })}
       />
       <CardContent>
-        <Typography>Start : {new Date(startTime).toDateString()}</Typography>
-        <Typography>End : {new Date(endTime).toDateString()}</Typography>
+        <Typography>
+          Date:{' '}
+          {new Intl.DateTimeFormat(undefined, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }).format(new Date(startTime))}
+        </Typography>
+        <Typography>
+          Start :{' '}
+          {new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: 'numeric' }).format(new Date(startTime))}
+        </Typography>
+        <Typography>
+          End : {new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: 'numeric' }).format(new Date(endTime))}
+        </Typography>
       </CardContent>
       {buttonProps.onClick && (
         <CardActions>
