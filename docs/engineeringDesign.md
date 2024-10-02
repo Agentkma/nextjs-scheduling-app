@@ -63,7 +63,7 @@ This doc is intended to design an MVP for front end based on the PRD given the t
 
 ## Platform Components
 
-TODO
+Out of Scope
 
 ## Data Design & Schema Changes
 
@@ -71,32 +71,31 @@ Out of Scope
 
 ## Metrics & Data Integration
 
-TODO
+Out of Scope
 
 ## Error Handling & Alerting
+- Datadog synthetics should be created for successful login, and site availability every 5 minutes
 
-TODO
 
 ## Safety
 
-TODO
+No unusual safety concerns.
 
 ## Security
 
-TODO
+No unique security concerns
 
 ## Audits and Logs
 
-TODO
+- Datadog should be added to project for error logging
 
 ## Scalability
 
-TODO
--->
+No issues.  Project should be setup in AWS to dynamically scale horizontally
 
 ## Cost
 
-TODO
+No unusual costs.
 
 ## Experimentation
 
