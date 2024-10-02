@@ -1,5 +1,2 @@
 # nextjs-scheduling-app
-full stack app for scheduling appointments
-
-# nextjs-scheduling-app
-full stack app for scheduling appointments
+full stack app for creating scheules, reserving and confriming appointments.
